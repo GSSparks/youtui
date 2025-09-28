@@ -17,7 +17,7 @@
 
           buildInputs = with pkgs; [
             python
-            python.pkgs.yt_dlp
+            yt-dlp
             mpv
             fzf
           ];
@@ -38,8 +38,6 @@
             nativeBuildInputs = [ pkgs.python3 ];
             propagatedBuildInputs = [
               python.pkgs.yt_dlp
-              mpv
-              fzf
             ];
 
             # Since this is a Python script, we can just “install” the script
