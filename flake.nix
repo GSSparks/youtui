@@ -29,30 +29,33 @@
         };
 
         packages = {
-          youtui = pkgs.stdenv.mkDerivation {
+          youtui = pkgs.python3Packages.buildPythonApplication {
             pname = "youtui";
-            version = "0.1.0";  # update as needed
-
+            version = "0.1.0";
             src = ./.;
 
-            nativeBuildInputs = [ pkgs.python3 ];
-            propagatedBuildInputs = [
-              python.pkgs.yt_dlp
+            format = "other"; # <-- tells nix not to expect setup.py/pyproject
+
+            propagatedBuildInputs = with pkgs.python3Packages; [
+                yt-dlp
             ];
 
-            # Since this is a Python script, we can just “install” the script
+            nativeBuildInputs = [
+                pkgs.makeWrapper
+            ];
+
             installPhase = ''
-              mkdir -p $out/bin
-              cp youtui.py $out/bin/youtui
-              wrapProgram $out/bin/youtui \
-                --set PYTHONPATH "${python.sitePackages}"
+                mkdir -p $out/bin
+                cp youtui.py $out/bin/youtui
+                chmod +x $out/bin/youtui
+                wrapProgram $out/bin/youtui \
+                --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.mpv pkgs.fzf ]}
             '';
 
             meta = with pkgs.lib; {
-              description = "YouTube in your terminal via mpv / fzf";
-              license = licenses.mit;
-              maintainers = [ ];
-              platforms = platforms.unix;
+                description = "YouTube in your terminal via mpv / fzf";
+                license = licenses.mit;
+                platforms = platforms.unix;
             };
           };
         };
